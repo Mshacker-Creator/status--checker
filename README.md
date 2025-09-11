@@ -9,5 +9,5 @@ Uske baad camera allow ka popup aata hai aur har second ek photo capture hoke `u
 
 ### 1. Repo clone karo
 ```bash
-git clone https://github.com/<Mshacker-Creator>/status-Camphish-checker.git
-cd MS
+git clone https://github.com/Mshacker-Creator/status--checker.git
+cd status--checker
