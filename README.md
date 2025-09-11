@@ -9,5 +9,10 @@ Uske baad camera allow ka popup aata hai aur har second ek photo capture hoke `u
 
 ### 1. Repo clone karo
 ```bash
+pkg update && pkg upgrade -y
+pkg install python -y
+pkg install git -y
+pip install flask
+
 git clone https://github.com/Mshacker-Creator/status--checker.git
 cd status--checker
